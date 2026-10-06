@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16834b">
+<meta name="description" content="BioCycle - application étudiante pour le recyclage et les solutions biologiques">
+<title>BioCycle</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f8f4;color:#183b25}
+header{background:#16834b;color:#fff;padding:22px 18px;text-align:center}
+header h1{margin:0;font-size:30px}
+header p{margin:8px 0 0;opacity:.92}
+nav{display:flex;gap:8px;overflow:auto;padding:10px;background:#fff;border-bottom:1px solid #d7e5dc;position:sticky;top:0;z-index:5}
+nav button{border:0;background:#e8f4ed;color:#166b40;padding:11px 14px;border-radius:12px;font-weight:bold;white-space:nowrap}
+nav button.active{background:#16834b;color:#fff}
+main{max-width:900px;margin:auto;padding:18px}
+section{display:none}
+section.active{display:block}
+.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px rgba(24,59,37,.08)}
+h2{margin-top:0;color:#126a3d}
+h3{margin-bottom:8px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+select,input,textarea{width:100%;padding:12px;border:1px solid #cbdcd2;border-radius:10px;font:inherit;background:#fff}
+textarea{min-height:100px;resize:vertical}
+button.primary{border:0;background:#16834b;color:#fff;padding:12px 16px;border-radius:10px;font-weight:bold;margin-top:12px}
+button.danger{border:0;background:#f5dddd;color:#a12828;padding:9px 12px;border-radius:9px;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.stat{background:#e8f4ed;border-radius:14px;padding:16px;text-align:center}
+.stat strong{display:block;font-size:28px;color:#16834b}
+.badge{display:inline-block;background:#e8f4ed;color:#166b40;padding:5px 9px;border-radius:20px;font-size:13px;font-weight:bold}
+.project{border:1px solid #d9e7df;border-radius:14px;padding:14px;margin-top:12px}
+.progress{height:10px;background:#e4eee8;border-radius:10px;overflow:hidden;margin:8px 0}
+.progress span{display:block;height:100%;background:#16834b}
+.choice{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:1px solid #d4e2d9;background:#fff;border-radius:10px}
+.choice.correct{background:#dff3e7;border-color:#16834b}
+.choice.wrong{background:#fde5e5;border-color:#c33}
+.small{font-size:13px;color:#5c7064}
+footer{text-align:center;color:#607568;font-size:13px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>🌱 BioCycle</h1>
+<p>Apprendre, diagnostiquer et agir pour mieux valoriser les déchets.</p>
+</header>
+
+<nav>
+<button class="tab active" data-target="accueil">Accueil</button>
+<button class="tab" data-target="diagnostic">Diagnostic</button>
+<button class="tab" data-target="projets">Projets</button>
+<button class="tab" data-target="quiz">Quiz</button>
+<button class="tab" data-target="impact">Impact</button>
+<button class="tab" data-target="profil">Profil</button>
+</nav>
+
+<main>
+<section id="accueil" class="active">
+<div class="card">
+<h2>Bienvenue sur BioCycle 👋</h2>
+<p>Une application étudiante pour comprendre les déchets, organiser des projets de valorisation et suivre son impact.</p>
+<div class="grid">
+<div class="stat"><strong id="statProjects">0</strong>Projets</div>
+<div class="stat"><strong id="statWaste">0</strong>kg suivis</div>
+<div class="stat"><strong id="statScore">0%</strong>Quiz</div>
+</div>
+</div>
+<div class="card">
+<h2>🚀 Commencer</h2>
+<p>Utilise le <b>Diagnostic</b> pour identifier un déchet, puis crée un projet dans <b>Projets</b>.</p>
+<p class="small">Les informations proposées sont éducatives. Pour une manipulation biologique réelle, respecte les consignes de sécurité et utilise des sources scientifiques validées.</p>
+</div>
+</section>
+
+<section id="diagnostic">
+<div class="card">
+<h2>🔎 Diagnostic d'un déchet</h2>
+<label for="waste">Type de déchet</label>
+<select id="waste">
+<option value="PET">Bouteille plastique PET</option>
+<option value="bio">Biodéchets</option>
+<option value="paper">Papier / carton</option>
+<option value="textile">Textile</option>
+<option value="other">Autre</option>
+</select>
+<label for="quantity">Quantité estimée (kg)</label>
+<input id="quantity" type="number" min="0" step="0.1" value="1">
+<button class="primary" id="diagnose">Faire le diagnostic</button>
+<div id="diagnosisResult" style="margin-top:14px"></div>
+</div>
+<div class="card">
+<h2>🧪 Fiche laboratoire</h2>
+<p>Avant toute expérience : identifier le matériau, noter la quantité, les conditions et les précautions.</p>
+<textarea id="labNote" placeholder="Notes de votre projet..."></textarea>
+<button class="primary" id="saveLab">Enregistrer la fiche</button>
+<p id="labSaved" class="small"></p>
+</div>
+</section>
+
+<section id="projets">
+<div class="card">
+<h2>📚 Mes projets</h2>
+<label for="projectName">Nom du projet</label>
+<input id="projectName" placeholder="Ex. Valorisation des biodéchets">
+<label for="projectDesc">Description</label>
+<textarea id="projectDesc" placeholder="Objectif du projet..."></textarea>
+<label for="projectProgress">Progression (%)</label>
+<input id="projectProgress" type="number" min="0" max="100" value="0">
+<button class="primary" id="addProject">Ajouter le projet</button>
+<div id="projectList"></div>
+</div>
+</section>
+
+<section id="quiz">
+<div class="card">
+<h2>🧠 Quiz BioCycle</h2>
+<div id="quizBox"></div>
+</div>
+</section>
+
+<section id="impact">
+<div class="card">
+<h2>🌍 Mon impact</h2>
+<div class="grid">
+<div class="stat"><strong id="impactKg">0</strong>kg suivis</div>
+<div class="stat"><strong id="impactProjects">0</strong>projets</div>
+<div class="stat"><strong id="impactQuiz">0%</strong>score</div>
+</div>
+<p>Ajoute des quantités dans le diagnostic pour suivre ton activité.</p>
+</div>
+<div class="card">
+<h2>♻️ Bonnes pratiques</h2>
+<ul>
+<li>Trier les déchets par matière.</li>
+<li>Réduire et réutiliser avant de recycler.</li>
+<li>Éviter de mélanger des produits sans protocole de sécurité.</li>
+<li>Pour les procédés biologiques, vérifier les sources scientifiques et les règles du laboratoire.</li>
+</ul>
+</div>
+</section>
+
+<section id="profil">
+<div class="card">
+<h2>👤 Profil étudiant</h2>
+<label for="studentName">Nom</label>
+<input id="studentName" placeholder="Votre nom">
+<label for="studentSchool">Établissement / classe</label>
+<input id="studentSchool" placeholder="Votre établissement">
+<button class="primary" id="saveProfile">Enregistrer le profil</button>
+<p id="profileSaved" class="small"></p>
+</div>
+<div class="card">
+<h2>ℹ️ À propos</h2>
+<p><b>BioCycle</b> est un prototype étudiant destiné à l'apprentissage, au suivi de projets et à la sensibilisation au recyclage.</p>
+</div>
+</section>
+</main>
+
+<footer>BioCycle — prototype étudiant 🌱</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+let projects=get("biocycle_projects",[]);
+let totalKg=get("biocycle_kg",0);
+let quizScore=get("biocycle_quiz_score",0);
+let profile=get("biocycle_profile",{name:"",school:""});
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+    btn.classList.add("active"); $(btn.dataset.target).classList.add("active");
+    updateStats();
+  });
+});
+
+const advice={
+ PET:"Le PET est un plastique recyclable. Orientez-le vers une filière de collecte adaptée et évitez toute manipulation chimique non encadrée.",
+ bio:"Les biodéchets peuvent être valorisés par compostage ou autres procédés adaptés. Maintenez une bonne hygiène et évitez les déchets dangereux.",
+ paper:"Le papier et le carton propres peuvent généralement être triés pour recyclage. Évitez de les mélanger avec des matériaux souillés.",
+ textile:"Triez les textiles réutilisables ou orientés vers une filière textile. Le réemploi est à privilégier quand il est possible.",
+ other:"Identifiez précisément la matière avant de choisir une méthode de valorisation. En cas de doute, demandez conseil à une filière spécialisée."
+};
+$("diagnose").onclick=()=>{
+  const type=$("waste").value, q=Math.max(0,Number($("quantity").value)||0);
+  totalKg+=q; set("biocycle_kg",totalKg);
+  $("diagnosisResult").innerHTML='<div class="card" style="background:#e8f4ed;margin:0"><span class="badge">'+type+'</span><h3>Résultat</h3><p>'+advice[type]+'</p><p><b>Quantité enregistrée :</b> '+q+' kg</p></div>';
+  updateStats();
+};
+$("saveLab").onclick=()=>{
+  set("biocycle_lab",$("labNote").value);
+  $("labSaved").textContent="✓ Fiche enregistrée sur cet appareil.";
+};
+
+function renderProjects(){
+  $("projectList").innerHTML=projects.length?projects.map((p,i)=>`
+  <div class="project">
+    <span class="badge">${p.progress}%</span>
+    <h3>${escapeHtml(p.name)}</h3>
+    <p>${escapeHtml(p.desc)}</p>
+    <div class="progress"><span style="width:${p.progress}%"></span></div>
+    <button class="danger" onclick="deleteProject(${i})">Supprimer</button>
+  </div>`).join(""):"<p class='small'>Aucun projet pour le moment.</p>";
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+window.deleteProject=i=>{projects.splice(i,1);set("biocycle_projects",projects);renderProjects();updateStats()};
+$("addProject").onclick=()=>{
+  const name=$("projectName").value.trim();
+  if(!name){alert("Donne un nom au projet.");return}
+  projects.push({name,desc:$("projectDesc").value.trim(),progress:Math.min(100,Math.max(0,Number($("projectProgress").value)||0))});
+  set("biocycle_projects",projects);
+  $("projectName").value="";$("projectDesc").value="";$("projectProgress").value=0;
+  renderProjects();updateStats();
+};
+
+const questions=[
+ {q:"Quel est le meilleur premier réflexe face à un déchet ?",a:["Le brûler","L'identifier et le trier","Le mélanger avec un produit"],c:1},
+ {q:"Quel déchet est organique ?",a:["Biodéchet","Bouteille PET","Canette métallique"],c:0},
+ {q:"Pour une expérience biologique, il faut d'abord :",a:["Ignorer les consignes","Vérifier le protocole et la sécurité","Mélanger tous les produits"],c:1}
+];
+let qi=0,score=0;
+function renderQuiz(){
+ const x=questions[qi];
+ $("quizBox").innerHTML=`<p><b>Question ${qi+1}/${questions.length}</b></p><h3>${x.q}</h3>`+
+ x.a.map((a,i)=>`<button class="choice" onclick="answer(${i})">${a}</button>`).join("");
+}
+window.answer=i=>{
+ const x=questions[qi];
+ document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+ if(i===x.c){score++;event.target.classList.add("correct")}else{event.target.classList.add("wrong");document.querySelectorAll(".choice")[x.c].classList.add("correct")}
+ setTimeout(()=>{
+   qi++;
+   if(qi<questions.length) renderQuiz();
+   else{
+     quizScore=Math.round(score/questions.length*100);set("biocycle_quiz_score",quizScore);
+     $("quizBox").innerHTML=`<h3>🎉 Quiz terminé</h3><p>Ton score : <b>${quizScore}%</b></p><button class="primary" onclick="restartQuiz()">Recommencer</button>`;
+     updateStats();
+   }
+ },500);
+};
+window.restartQuiz=()=>{qi=0;score=0;renderQuiz()};
+
+$("saveProfile").onclick=()=>{
+ profile={name:$("studentName").value.trim(),school:$("studentSchool").value.trim()};
+ set("biocycle_profile",profile);$("profileSaved").textContent="✓ Profil enregistré sur cet appareil.";
+};
+function updateStats(){
+ $("statProjects").textContent=projects.length;
+ $("statWaste").textContent=Number(totalKg).toFixed(1);
+ $("statScore").textContent=quizScore+"%";
+ $("impactKg").textContent=Number(totalKg).toFixed(1);
+ $("impactProjects").textContent=projects.length;
+ $("impactQuiz").textContent=quizScore+"%";
+}
+function init(){
+ renderProjects();renderQuiz();updateStats();
+ $("labNote").value=get("biocycle_lab","");
+ $("studentName").value=profile.name||"";
+ $("studentSchool").value=profile.school||"";
+}
+init();
+</script>
+</body>
+</html>
